@@ -8,15 +8,21 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue';
-import { assertInstanceof, isDefined } from '@petrhdk/util';
-import { useMutationObserver } from '@vueuse/core';
+import { assertInstanceof, delegateFocus, isDefined } from '@petrhdk/util';
+import { useEventListener, useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 
+/* props */
 const props = defineProps<{
   teleportTo: Node,
   relativeTo: 'parentElement' | 'previousElementSibling',
   placements: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
+}>();
+
+/* emits */
+const emit = defineEmits<{
+  (eventType: 'lostFocus'): void,
 }>();
 
 /* template refs */
@@ -61,6 +67,36 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     shift({ padding: 8 }),
   ],
   whileElementsMounted: autoUpdate,
+});
+
+/* auto focus - try to focus slotEl or any of its children */
+onMounted(() => {
+  delegateFocus(slotEl.value);
+});
+
+/* keyboard navigation */
+useEventListener(slotEl, 'keydown', (event) => {
+  const rootNode = assertInstanceof(slotEl.value!.getRootNode(), [Document, ShadowRoot]);
+  const activeElement = rootNode.activeElement ?? undefined;
+
+  if (event.code === 'ArrowUp') {
+    delegateFocus(slotEl.value, { upFrom: activeElement });
+  }
+
+  if (event.code === 'ArrowDown') {
+    delegateFocus(slotEl.value, { downFrom: activeElement });
+  }
+
+  if (event.code === 'Escape') {
+    (activeElement as HTMLElement)?.blur?.();
+  }
+});
+
+/* lost-focus event */
+useEventListener(slotEl, 'focusout', (event) => {
+  if (!slotEl.value!.contains(event.relatedTarget as HTMLElement)) {
+    emit('lostFocus');
+  }
 });
 </script>
 

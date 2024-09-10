@@ -12,8 +12,8 @@ importers:
         specifier: ^1.1.4
         version: 1.1.4(vue@3.5.4(typescript@5.6.2))
       '@petrhdk/util':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.4.0
+        version: 0.4.0
       '@vueuse/core':
         specifier: ^11.0.3
         version: 11.0.3(vue@3.5.4(typescript@5.6.2))
@@ -366,8 +366,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@petrhdk/util@0.2.0':
-    resolution: {integrity: sha512-9pEAfM/JgyX0C3rOO0mKMwwT6tntyhHrYVVws0L5sXs7oH72E1NVLGaOYZ0j/jvymqvfrm+e7+qMXtXEecC40w==}
+  '@petrhdk/util@0.4.0':
+    resolution: {integrity: sha512-fm8hEsaUDZXXJCXtRsAaiWfDjsVJ0lf11GziBJazGj+ojRcYJcAxv/XtSt81X5dilgg53UkIYklX+nwC0NTIDA==}
 
   '@pkgr/core@0.1.1':
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
@@ -2289,7 +2289,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@petrhdk/util@0.2.0': {}
+  '@petrhdk/util@0.4.0': {}
 
   '@pkgr/core@0.1.1': {}
 
