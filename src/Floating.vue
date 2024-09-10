@@ -8,9 +8,9 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue';
-import { assertInstanceof, delegateFocus, isDefined } from '@petrhdk/util';
+import { assertInstanceof, focusMenuItem, isDefined, isNotDefined } from '@petrhdk/util';
 import { useEventListener, useMutationObserver } from '@vueuse/core';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 /* props */
 const props = defineProps<{
@@ -18,6 +18,8 @@ const props = defineProps<{
   relativeTo: 'parentElement' | 'previousElementSibling',
   placements: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
+  autoFocus?: boolean,
+  keyboardNavigation?: boolean,
 }>();
 
 /* emits */
@@ -69,32 +71,40 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
   whileElementsMounted: autoUpdate,
 });
 
-/* auto focus - try to focus slotEl or any of its children */
-onMounted(() => {
-  delegateFocus(slotEl.value);
-});
+/* auto-focus */
+if (props.autoFocus) {
+  watch(slotEl, () => {
+    if (isDefined(slotEl.value)) {
+      focusMenuItem(slotEl.value, 'first');
+    }
+  });
+}
 
 /* keyboard navigation */
-useEventListener(slotEl, 'keydown', (event) => {
-  const rootNode = assertInstanceof(slotEl.value!.getRootNode(), [Document, ShadowRoot]);
-  const activeElement = rootNode.activeElement ?? undefined;
+if (props.keyboardNavigation) {
+  useEventListener(slotEl, 'keydown', (event) => {
+    if (event.code === 'ArrowUp') {
+      focusMenuItem(slotEl.value!, 'previous');
+    }
 
-  if (event.code === 'ArrowUp') {
-    delegateFocus(slotEl.value, { upFrom: activeElement });
-  }
+    if (event.code === 'ArrowDown') {
+      focusMenuItem(slotEl.value!, 'next');
+    }
 
-  if (event.code === 'ArrowDown') {
-    delegateFocus(slotEl.value, { downFrom: activeElement });
-  }
+    if (event.code === 'Escape') {
+      // blur the currently focused element
+      const documentRoot = assertInstanceof(slotEl.value!.getRootNode(), [Document, ShadowRoot]);
+      (assertInstanceof(documentRoot.activeElement, Element) as HTMLElement).blur();
+    }
+  });
+}
 
-  if (event.code === 'Escape') {
-    (activeElement as HTMLElement)?.blur?.();
-  }
-});
-
-/* lost-focus event */
+/* lostFocus event */
 useEventListener(slotEl, 'focusout', (event) => {
-  if (!slotEl.value!.contains(event.relatedTarget as HTMLElement)) {
+  if (
+    isNotDefined(event.relatedTarget) ||
+    !slotEl.value!.contains(assertInstanceof(event.relatedTarget, Element))
+  ) {
     emit('lostFocus');
   }
 });
