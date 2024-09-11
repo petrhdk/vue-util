@@ -8,9 +8,9 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue';
-import { assertInstanceof, focusMenuItem, isDefined, isNotDefined } from '@petrhdk/util';
-import { useEventListener, useMutationObserver } from '@vueuse/core';
-import { computed, onMounted, ref, watch } from 'vue';
+import { assertInstanceof, isDefined } from '@petrhdk/util';
+import { useMutationObserver } from '@vueuse/core';
+import { computed, onMounted, ref } from 'vue';
 
 /* props */
 const props = defineProps<{
@@ -20,11 +20,6 @@ const props = defineProps<{
   offset?: OffsetOptions,
   autoFocus?: boolean,
   keyboardNavigation?: boolean,
-}>();
-
-/* emits */
-const emit = defineEmits<{
-  (eventType: 'lostFocus'): void,
 }>();
 
 /* template refs */
@@ -69,44 +64,6 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     shift({ padding: 8 }),
   ],
   whileElementsMounted: autoUpdate,
-});
-
-/* auto-focus */
-if (props.autoFocus) {
-  watch(slotEl, () => {
-    if (isDefined(slotEl.value)) {
-      focusMenuItem(slotEl.value, 'first');
-    }
-  });
-}
-
-/* keyboard navigation */
-if (props.keyboardNavigation) {
-  useEventListener(slotEl, 'keydown', (event) => {
-    if (event.code === 'ArrowUp') {
-      focusMenuItem(slotEl.value!, 'previous');
-    }
-
-    if (event.code === 'ArrowDown') {
-      focusMenuItem(slotEl.value!, 'next');
-    }
-
-    if (event.code === 'Escape') {
-      // blur the currently focused element
-      const documentRoot = assertInstanceof(slotEl.value!.getRootNode(), [Document, ShadowRoot]);
-      (assertInstanceof(documentRoot.activeElement, Element) as HTMLElement).blur();
-    }
-  });
-}
-
-/* lostFocus event */
-useEventListener(slotEl, 'focusout', (event) => {
-  if (
-    isNotDefined(event.relatedTarget) ||
-    !slotEl.value!.contains(assertInstanceof(event.relatedTarget, Element))
-  ) {
-    emit('lostFocus');
-  }
 });
 </script>
 

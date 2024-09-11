@@ -1,7 +1,7 @@
 {
   "name": "@petrhdk/vue-util",
   "type": "module",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "license": "MIT",
   "repository": "github:petrhdk/vue-util",
   "exports": {
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@floating-ui/vue": "^1.1.4",
-    "@petrhdk/util": "^1.0.0",
+    "@petrhdk/util": "^2.0.0",
     "@vueuse/core": "^11.0.3"
   },
   "devDependencies": {
