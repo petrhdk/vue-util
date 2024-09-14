@@ -2,6 +2,7 @@ import { assertInstanceof, isNotDefined } from '@petrhdk/util';
 import { useEventListener } from '@vueuse/core';
 import { type MaybeRefOrGetter, toValue } from 'vue';
 
+export { default as DivButton } from './DivButton.vue';
 export { default as Floating } from './Floating.vue';
 
 /**
