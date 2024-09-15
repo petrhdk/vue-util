@@ -3,19 +3,29 @@ import { isDefined } from '@petrhdk/util';
 import { useEventListener } from '@vueuse/core';
 import { ref } from 'vue';
 
-defineProps<{
+const props = withDefaults(defineProps<{
   innerHtml?: string,
-}>();
+  clickOnEnter?: boolean,
+  clickOnSpace?: boolean,
+  blurOnEscape?: boolean,
+}>(), {
+  clickOnEnter: true,
+  clickOnSpace: true,
+  blurOnEscape: true,
+});
 
 /* template ref */
 const el = ref<HTMLElement>();
 
 /* focus logic */
 useEventListener(el, 'keydown', (event) => {
-  if (event.code === 'Enter' || event.code === 'Space') {
+  if (event.code === 'Enter' && props.clickOnEnter) {
     el.value!.click();
   }
-  if (event.code === 'Escape') {
+  if (event.code === 'Space' && props.clickOnSpace) {
+    el.value!.click();
+  }
+  if (event.code === 'Escape' && props.blurOnEscape) {
     el.value!.blur();
   }
 });
