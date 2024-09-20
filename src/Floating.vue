@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
   placements?: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
 }>(), {
-  placements: () => ['right-start', 'right-end', 'bottom-start', 'bottom-end', 'top-start', 'top-end', 'left-start', 'left-end'],
+  placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
   offset: 0,
 });
 
