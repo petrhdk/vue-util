@@ -18,9 +18,11 @@ const props = withDefaults(defineProps<{
   relativeTo: 'parentElement' | 'previousElementSibling',
   placements?: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
+  viewportPadding?: number,
 }>(), {
   placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
   offset: 0,
+  viewportPadding: 8,
 });
 
 /* template refs */
@@ -67,7 +69,7 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     shift({
       mainAxis: true,
       crossAxis: true,
-      padding: 8,
+      padding: props.viewportPadding,
     }),
   ],
   whileElementsMounted: autoUpdate,
