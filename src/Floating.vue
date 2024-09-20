@@ -61,8 +61,14 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
   placement: props.placements[0],
   middleware: [
     offset(props.offset),
-    flip({ fallbackPlacements: props.placements.slice(1) }),
-    shift({ padding: 8 }),
+    flip({
+      fallbackPlacements: props.placements.slice(1),
+    }),
+    shift({
+      mainAxis: true,
+      crossAxis: true,
+      padding: 8,
+    }),
   ],
   whileElementsMounted: autoUpdate,
 });
