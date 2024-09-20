@@ -13,14 +13,15 @@ import { useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 
 /* props */
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   teleportTo: Node,
   relativeTo: 'parentElement' | 'previousElementSibling',
-  placements: [Placement, ...Placement[]], // array with at least 1 placement
+  placements?: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
-  autoFocus?: boolean,
-  keyboardNavigation?: boolean,
-}>();
+}>(), {
+  placements: () => ['right-start', 'right-end', 'bottom-start', 'bottom-end', 'top-start', 'top-end', 'left-start', 'left-end'],
+  offset: 0,
+});
 
 /* template refs */
 const teleport = ref<Comment>(); // rendered as `<!--teleport start--><!--teleport end-->`
@@ -59,7 +60,7 @@ useMutationObserver(slotContainer, updateSlotEl, { childList: true });
 const { floatingStyles } = useFloating(referenceEl, slotEl, {
   placement: props.placements[0],
   middleware: [
-    offset(props.offset ?? 8),
+    offset(props.offset),
     flip({ fallbackPlacements: props.placements.slice(1) }),
     shift({ padding: 8 }),
   ],
