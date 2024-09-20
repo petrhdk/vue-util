@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
   viewportPadding?: number,
 }>(), {
   placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
-  offset: 0,
+  offset: 8,
   viewportPadding: 8,
 });
 
