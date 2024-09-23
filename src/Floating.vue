@@ -10,7 +10,7 @@ import {
 } from '@floating-ui/vue';
 import { assertInstanceof, isDefined } from '@petrhdk/util';
 import { useMutationObserver } from '@vueuse/core';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 
 /* props */
 const props = withDefaults(defineProps<{
@@ -19,11 +19,13 @@ const props = withDefaults(defineProps<{
   offset?: OffsetOptions,
   viewportPadding?: number,
   teleportTo?: Node,
+  zIndex?: string,
 }>(), {
   placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
   offset: 8,
   viewportPadding: 8,
   teleportTo: () => document.body,
+  zIndex: '1030',
 });
 
 /* template refs */
@@ -74,6 +76,13 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     }),
   ],
   whileElementsMounted: autoUpdate,
+});
+watchEffect(() => {
+  Object.assign(floatingStyles.value, {
+    zIndex: props.zIndex,
+    maxWidth: `calc(100vw - ${2 * props.viewportPadding}px)`,
+    maxHeight: `calc(100vh - ${2 * props.viewportPadding}px)`,
+  });
 });
 </script>
 
