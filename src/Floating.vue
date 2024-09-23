@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<{
   offset: 8,
   viewportPadding: 8,
   teleportTo: () => document.body,
-  zIndex: '1030',
+  zIndex: '100',
 });
 
 /* template refs */
