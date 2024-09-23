@@ -75,6 +75,7 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     offset(props.offset),
     flip({
       fallbackPlacements: props.placements.slice(1),
+      padding: props.viewportPadding,
     }),
     shift({
       mainAxis: true,
