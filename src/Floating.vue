@@ -14,15 +14,16 @@ import { computed, onMounted, ref } from 'vue';
 
 /* props */
 const props = withDefaults(defineProps<{
-  teleportTo: Node,
   relativeTo: 'parentElement' | 'previousElementSibling',
   placements?: [Placement, ...Placement[]], // array with at least 1 placement
   offset?: OffsetOptions,
   viewportPadding?: number,
+  teleportTo?: Node,
 }>(), {
   placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
   offset: 8,
   viewportPadding: 8,
+  teleportTo: () => document.body,
 });
 
 /* template refs */
