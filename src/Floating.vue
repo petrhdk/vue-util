@@ -8,7 +8,7 @@ import {
   shift,
   useFloating,
 } from '@floating-ui/vue';
-import { assertInstanceof, isDefined } from '@petrhdk/util';
+import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
 import { useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref, watchEffect } from 'vue';
 
@@ -34,16 +34,23 @@ const slotContainer = ref<HTMLElement>();
 
 /* reference element */
 const referenceEl = computed<HTMLElement | undefined>(() => {
-  if (isDefined(teleport.value)) {
-    if (props.relativeTo === 'previousElementSibling') {
-      return isDefined(teleport.value.previousElementSibling)
-        ? assertInstanceof(teleport.value.previousElementSibling, HTMLElement)
-        : undefined;
-    }
-    if (props.relativeTo === 'parentElement') {
-      return teleport.value.parentElement ?? undefined;
+  if (isNotDefined(teleport.value)) return undefined;
+
+  if (props.relativeTo === 'previousElementSibling') {
+    if (isDefined(teleport.value.previousElementSibling)) {
+      return teleport.value.previousElementSibling as HTMLElement;
     }
   }
+
+  if (props.relativeTo === 'parentElement') {
+    if (isDefined(teleport.value.parentElement)) {
+      return teleport.value.parentElement;
+    }
+    if (teleport.value.getRootNode() instanceof ShadowRoot) {
+      return (teleport.value.getRootNode() as ShadowRoot).host as HTMLElement;
+    }
+  }
+
   return undefined;
 });
 
