@@ -94,6 +94,17 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
   ],
   whileElementsMounted: autoUpdate,
 });
+// assign to slotEl
+watchEffect(() => {
+  if (isNotDefined(slotEl.value))
+    return;
+  Object.assign(slotEl.value.style, {
+    ...floatingStyles.value, // 'absolute', 'top', 'left', 'transform'
+    zIndex: props.zIndex, // 'z-index'
+    maxWidth: maxWidth.value, // max-width
+    maxHeight: maxHeight.value, // max-height
+  });
+});
 </script>
 
 <template>
@@ -104,14 +115,7 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
     <!-- slot container (for watching slot changes) -->
     <div ref="slotContainer" :style="{ display: 'contents' }">
       <!-- slot content (floating element) -->
-      <slot
-        :floating-styles="{
-          ...floatingStyles, // 'absolute', 'top', 'left', 'transform'
-          zIndex, // 'z-index'
-          maxWidth, // max-width
-          maxHeight, // max-height
-        }"
-      />
+      <slot />
     </div>
   </Teleport>
 </template>
