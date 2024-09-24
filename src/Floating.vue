@@ -9,7 +9,7 @@ import {
   size,
   useFloating,
 } from '@floating-ui/vue';
-import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
+import { isDefined, isNotDefined } from '@petrhdk/util';
 import { useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref, watchEffect } from 'vue';
 
@@ -55,24 +55,21 @@ const referenceEl = computed<HTMLElement | undefined>(() => {
   return undefined;
 });
 
-/* slot element, to be positioned as floating */
-const slotEl = ref<HTMLElement>();
-function updateSlotEl() {
-  slotEl.value =
-    isDefined(slotContainer.value?.firstElementChild)
-      ? assertInstanceof(slotContainer.value.firstElementChild, HTMLElement)
-      : undefined;
+/* floating element, retrieved from slot */
+const floatingEl = ref<HTMLElement>();
+function updateFloatingEl() {
+  floatingEl.value = slotContainer.value?.firstElementChild as HTMLElement | null | undefined ?? undefined;
   // create warning for inproper usage
   if ((slotContainer.value?.childElementCount ?? 0) > 1)
     throw new Error('More than one element inside of <Floating></Floating>');
 }
-onMounted(updateSlotEl);
-useMutationObserver(slotContainer, updateSlotEl, { childList: true });
+onMounted(updateFloatingEl);
+useMutationObserver(slotContainer, updateFloatingEl, { childList: true });
 
 /* floating ui */
 const maxWidth = ref<string>();
 const maxHeight = ref<string>();
-const { floatingStyles } = useFloating(referenceEl, slotEl, {
+const { floatingStyles } = useFloating(referenceEl, floatingEl, {
   placement: props.placements[0],
   middleware: [
     offset(props.offset),
@@ -94,11 +91,10 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
   ],
   whileElementsMounted: autoUpdate,
 });
-// assign to slotEl
 watchEffect(() => {
-  if (isNotDefined(slotEl.value))
+  if (isNotDefined(floatingEl.value))
     return;
-  Object.assign(slotEl.value.style, {
+  Object.assign(floatingEl.value.style, {
     ...floatingStyles.value, // 'absolute', 'top', 'left', 'transform'
     zIndex: props.zIndex, // 'z-index'
     maxWidth: maxWidth.value, // max-width
@@ -114,7 +110,7 @@ watchEffect(() => {
   >
     <!-- slot container (for watching slot changes) -->
     <div ref="slotContainer" :style="{ display: 'contents' }">
-      <!-- slot content (floating element) -->
+      <!-- slot content (the floating element) -->
       <slot />
     </div>
   </Teleport>
