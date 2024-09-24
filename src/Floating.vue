@@ -6,6 +6,7 @@ import {
   type OffsetOptions,
   type Placement,
   shift,
+  size,
   useFloating,
 } from '@floating-ui/vue';
 import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
@@ -69,6 +70,8 @@ onMounted(updateSlotEl);
 useMutationObserver(slotContainer, updateSlotEl, { childList: true });
 
 /* floating ui */
+const maxWidth = ref<string>();
+const maxHeight = ref<string>();
 const { floatingStyles } = useFloating(referenceEl, slotEl, {
   placement: props.placements[0],
   middleware: [
@@ -82,15 +85,14 @@ const { floatingStyles } = useFloating(referenceEl, slotEl, {
       crossAxis: true,
       padding: props.viewportPadding,
     }),
+    size({
+      apply({ availableWidth, availableHeight }) {
+        maxWidth.value = `${availableWidth - 2 * props.viewportPadding}px`;
+        maxHeight.value = `${availableHeight - 2 * props.viewportPadding}px`;
+      },
+    }),
   ],
   whileElementsMounted: autoUpdate,
-});
-watchEffect(() => {
-  Object.assign(floatingStyles.value, {
-    zIndex: props.zIndex,
-    maxWidth: `calc(100vw - ${2 * props.viewportPadding}px)`,
-    maxHeight: `calc(100vh - ${2 * props.viewportPadding}px)`,
-  });
 });
 </script>
 
@@ -102,7 +104,14 @@ watchEffect(() => {
     <!-- slot container (for watching slot changes) -->
     <div ref="slotContainer" :style="{ display: 'contents' }">
       <!-- slot content (floating element) -->
-      <slot :floating-styles="floatingStyles" />
+      <slot
+        :floating-styles="{
+          ...floatingStyles, // 'absolute', 'top', 'left', 'transform'
+          zIndex, // 'z-index'
+          maxWidth, // max-width
+          maxHeight, // max-height
+        }"
+      />
     </div>
   </Teleport>
 </template>
