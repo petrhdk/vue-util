@@ -16,13 +16,17 @@ import { computed, onMounted, ref, watchEffect } from 'vue';
 /* props */
 const props = withDefaults(defineProps<{
   relativeTo: 'parentElement' | 'previousElementSibling',
-  placements?: [Placement, ...Placement[]], // array with at least 1 placement
+  placement: Placement,
+  fallbackPlacements?: Placement[],
   offset?: OffsetOptions,
   viewportPadding?: number,
   teleportTo?: Node,
   zIndex?: string,
 }>(), {
-  placements: () => ['bottom', 'bottom-start', 'bottom-end', 'right-start', 'right', 'right-end', 'left-start', 'left', 'left-end', 'top', 'top-start', 'top-end'],
+  fallbackPlacements: ({ placement }) => {
+    const side = placement.split('-')[0];
+    return [`${side}-start`, `${side}-end`, side, 'right-start', 'right-end', 'right', 'left-start', 'left-end', 'left', 'bottom-start', 'bottom-end', 'bottom', 'top-start', 'top-end', 'top'] as Placement[];
+  },
   offset: 8,
   viewportPadding: 8,
   teleportTo: () => document.body,
@@ -70,11 +74,11 @@ useMutationObserver(slotContainer, updateFloatingEl, { childList: true });
 const maxWidth = ref<string>();
 const maxHeight = ref<string>();
 const { floatingStyles } = useFloating(referenceEl, floatingEl, {
-  placement: props.placements[0],
+  placement: props.placement,
   middleware: [
     offset(props.offset),
     flip({
-      fallbackPlacements: props.placements.slice(1),
+      fallbackPlacements: props.fallbackPlacements,
       padding: props.viewportPadding,
     }),
     shift({
