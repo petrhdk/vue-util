@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
   placement: Placement,
   fallbackPlacements?: Placement[],
   offset?: OffsetOptions,
+  minWidth?: number,
   viewportPadding?: number,
   teleportTo?: Node,
   zIndex?: string,
@@ -73,6 +74,7 @@ useMutationObserver(slotContainer, updateFloatingEl, { childList: true });
 /* floating ui */
 const maxWidth = ref<string>();
 const maxHeight = ref<string>();
+const minWidth = ref<string>();
 const { floatingStyles } = useFloating(referenceEl, floatingEl, {
   placement: props.placement,
   middleware: [
@@ -90,6 +92,13 @@ const { floatingStyles } = useFloating(referenceEl, floatingEl, {
       apply({ availableWidth, availableHeight }) {
         maxWidth.value = `${availableWidth - 2 * props.viewportPadding}px`;
         maxHeight.value = `${availableHeight - 2 * props.viewportPadding}px`;
+        minWidth.value =
+          isDefined(props.minWidth)
+            ? `${Math.min(
+              props.minWidth,
+              availableWidth - 2 * props.viewportPadding,
+            )}px`
+            : undefined;
       },
     }),
   ],
@@ -100,9 +109,10 @@ watchEffect(() => {
     return;
   Object.assign(floatingEl.value.style, {
     ...floatingStyles.value, // 'absolute', 'top', 'left', 'transform'
-    zIndex: props.zIndex, // 'z-index'
-    maxWidth: maxWidth.value, // max-width
-    maxHeight: maxHeight.value, // max-height
+    maxWidth: maxWidth.value,
+    maxHeight: maxHeight.value,
+    minWidth: minWidth.value,
+    zIndex: props.zIndex,
   });
 });
 </script>
