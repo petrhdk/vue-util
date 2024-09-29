@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
   placement: Placement,
   fallbackPlacements?: Placement[],
   offset?: OffsetOptions,
-  minWidth?: number,
+  baseWidth?: number,
   viewportPadding?: number,
   teleportTo?: Node,
   zIndex?: string,
@@ -93,9 +93,9 @@ const { floatingStyles } = useFloating(referenceEl, floatingEl, {
         maxWidth.value = `${availableWidth - 2 * props.viewportPadding}px`;
         maxHeight.value = `${availableHeight - 2 * props.viewportPadding}px`;
         minWidth.value =
-          isDefined(props.minWidth)
+          isDefined(props.baseWidth)
             ? `${Math.min(
-              props.minWidth,
+              props.baseWidth,
               availableWidth - 2 * props.viewportPadding,
             )}px`
             : undefined;
