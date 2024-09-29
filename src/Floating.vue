@@ -39,14 +39,9 @@ const teleport = ref<Comment>(); // rendered as `<!--teleport start--><!--telepo
 const slotContainer = ref<HTMLElement>();
 
 /* reference element */
-const referenceEl = computed<HTMLElement | undefined>(() => {
-  if (isNotDefined(teleport.value)) return undefined;
-
-  if (props.relativeTo === 'previousElementSibling') {
-    if (isDefined(teleport.value.previousElementSibling)) {
-      return teleport.value.previousElementSibling as HTMLElement;
-    }
-  }
+const referenceEl = computed<Element | undefined>(() => {
+  if (isNotDefined(teleport.value))
+    return undefined;
 
   if (props.relativeTo === 'parentElement') {
     if (isDefined(teleport.value.parentElement)) {
@@ -54,6 +49,12 @@ const referenceEl = computed<HTMLElement | undefined>(() => {
     }
     if (teleport.value.getRootNode() instanceof ShadowRoot) {
       return (teleport.value.getRootNode() as ShadowRoot).host as HTMLElement;
+    }
+  }
+
+  if (props.relativeTo === 'previousElementSibling') {
+    if (isDefined(teleport.value.previousElementSibling)) {
+      return teleport.value.previousElementSibling as HTMLElement;
     }
   }
 
@@ -71,7 +72,7 @@ function updateFloatingEl() {
 onMounted(updateFloatingEl);
 useMutationObserver(slotContainer, updateFloatingEl, { childList: true });
 
-/* floating ui */
+/* dynamic positioning */
 const maxWidth = ref<string>();
 const maxHeight = ref<string>();
 const minWidth = ref<string>();
