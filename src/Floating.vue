@@ -10,7 +10,7 @@ import {
   useFloating,
 } from '@floating-ui/vue';
 import { isDefined, isNotDefined } from '@petrhdk/util';
-import { useMutationObserver } from '@vueuse/core';
+import { useEventListener, useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref, watchEffect } from 'vue';
 
 /* props */
@@ -23,6 +23,7 @@ const props = withDefaults(defineProps<{
   viewportPadding?: number,
   teleportTo?: Node,
   zIndex?: string,
+  toggleOnHover?: boolean,
 }>(), {
   fallbackPlacements: ({ placement }) => {
     if (placement === 'top') {
@@ -108,16 +109,36 @@ const referenceEl = computed<Element | undefined>(() => {
   return undefined;
 });
 
-/* floating element, retrieved from slot */
-const floatingEl = ref<HTMLElement>();
-function updateFloatingEl() {
-  floatingEl.value = slotContainer.value?.firstElementChild as HTMLElement | null | undefined ?? undefined;
-  // create warning for inproper usage
-  if ((slotContainer.value?.childElementCount ?? 0) > 1)
-    throw new Error('More than one element inside of <Floating></Floating>');
+/* reference element hover state */
+const referenceElementIsHovered = ref(false);
+// initial hover state
+watchEffect(() => {
+  if (isDefined(referenceEl.value)) {
+    referenceElementIsHovered.value = referenceEl.value.matches(':hover');
+  }
+});
+// update hover state
+useEventListener(referenceEl, ['mouseenter', 'mouseleave'], (event) => {
+  referenceElementIsHovered.value = event.type === 'mouseenter';
+});
+
+/* collect slot content */
+const slotElement = ref<HTMLElement>();
+function updateSlotElement() {
+  // update slot element
+  slotElement.value = slotContainer.value!.firstElementChild as HTMLElement | null | undefined ?? undefined;
+  // warning for inproper usage
+  if ((slotContainer.value!.childElementCount) > 1) console.error('More than one element inside of <Floating>!');
 }
-onMounted(updateFloatingEl);
-useMutationObserver(slotContainer, updateFloatingEl, { childList: true });
+onMounted(updateSlotElement);
+useMutationObserver(slotContainer, updateSlotElement, { childList: true });
+
+/* floating element */
+const floatingEl = computed(() => {
+  if (props.toggleOnHover && !referenceElementIsHovered.value)
+    return undefined;
+  return slotElement.value;
+});
 
 /* dynamic positioning */
 const maxWidth = ref<string>();
@@ -153,15 +174,15 @@ const { floatingStyles } = useFloating(referenceEl, floatingEl, {
   whileElementsMounted: autoUpdate,
 });
 watchEffect(() => {
-  if (isNotDefined(floatingEl.value))
-    return;
-  Object.assign(floatingEl.value.style, {
-    ...floatingStyles.value, // 'absolute', 'top', 'left', 'transform'
-    maxWidth: maxWidth.value,
-    maxHeight: maxHeight.value,
-    minWidth: minWidth.value,
-    zIndex: props.zIndex,
-  });
+  if (isDefined(floatingEl.value)) {
+    Object.assign(floatingEl.value.style, {
+      ...floatingStyles.value, // 'absolute', 'top', 'left', 'transform'
+      maxWidth: maxWidth.value,
+      maxHeight: maxHeight.value,
+      minWidth: minWidth.value,
+      zIndex: props.zIndex,
+    });
+  }
 });
 </script>
 
@@ -171,7 +192,10 @@ watchEffect(() => {
     :to="teleportTo"
   >
     <!-- slot container (for watching slot changes) -->
-    <div ref="slotContainer" :style="{ display: 'contents' }">
+    <div
+      ref="slotContainer"
+      :style="{ display: isDefined(floatingEl) ? 'contents' : 'none' }"
+    >
       <!-- slot content (the floating element) -->
       <slot />
     </div>
