@@ -25,8 +25,55 @@ const props = withDefaults(defineProps<{
   zIndex?: string,
 }>(), {
   fallbackPlacements: ({ placement }) => {
-    const side = placement.split('-')[0];
-    return [`${side}-start`, `${side}-end`, side, 'right-start', 'right-end', 'right', 'left-start', 'left-end', 'left', 'bottom-start', 'bottom-end', 'bottom', 'top-start', 'top-end', 'top'] as Placement[];
+    if (placement === 'top') {
+      return ['bottom', 'right', 'left'];
+    }
+    if (placement === 'bottom') {
+      return ['top', 'right', 'left'];
+    }
+    if (placement === 'left') {
+      return ['right', 'bottom', 'top'];
+    }
+    if (placement === 'right') {
+      return ['left', 'bottom', 'top'];
+    }
+
+    const [side, alignment] = placement.split('-') as ['top' | 'bottom' | 'left' | 'right', 'start' | 'end'];
+
+    function opposite(sideOrAlignment: 'top' | 'bottom' | 'left' | 'right' | 'start' | 'end') {
+      switch (sideOrAlignment) {
+        case 'top': return 'bottom';
+        case 'bottom': return 'top';
+        case 'left': return 'right';
+        case 'right': return 'left';
+        case 'start': return 'end';
+        case 'end': return 'start';
+      }
+    }
+
+    function diagonal(side: 'top' | 'bottom' | 'left' | 'right') {
+      switch (side) {
+        case 'right': return 'bottom';
+        case 'bottom': return 'right';
+        case 'left': return 'top';
+        case 'top': return 'left';
+      }
+    }
+
+    return [
+    // `${side}-${alignment}`,
+      `${side}-${opposite(alignment)}`,
+      `${opposite(side)}-${alignment}`,
+      `${opposite(side)}-${opposite(alignment)}`,
+      `${diagonal(side)}-${alignment}`,
+      `${diagonal(side)}-${opposite(alignment)}`,
+      `${opposite(diagonal(side))}-${alignment}`,
+      `${opposite(diagonal(side))}-${opposite(alignment)}`,
+      side,
+      opposite(side),
+      diagonal(side),
+      opposite(diagonal(side)),
+    ] as Placement[];
   },
   offset: 8,
   viewportPadding: 8,
