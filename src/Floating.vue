@@ -119,8 +119,11 @@ const slotElement = ref<HTMLElement>();
 function updateSlotElement() {
   // update slot element
   slotElement.value = slotContainer.value!.firstElementChild as HTMLElement | null | undefined ?? undefined;
-  // warning for inproper usage
-  if ((slotContainer.value!.childElementCount) > 1) console.error('More than one element inside of <Floating>!');
+  // warnings for inproper usage
+  if ((slotContainer.value!.childElementCount) > 1)
+    throw new Error(`More than one element inside of <Floating>!`);
+  if (slotContainer.value!.textContent !== (slotContainer.value!.firstElementChild?.textContent ?? ''))
+    throw new Error(`Do not place text nodes in <Floating>. It needs a proper html element for positioning.`);
 }
 onMounted(updateSlotElement);
 useMutationObserver(slotContainer, updateSlotElement, { childList: true });
