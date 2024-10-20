@@ -1,6 +1,6 @@
-import { assertInstanceof, isNotDefined } from '@petrhdk/util';
+import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
 import { useEventListener } from '@vueuse/core';
-import { type MaybeRefOrGetter, toValue } from 'vue';
+import { type MaybeRefOrGetter, ref, toRef, toValue, watch } from 'vue';
 
 export { default as DivButton } from './DivButton.vue';
 export { default as Floating } from './Floating.vue';
@@ -17,4 +17,20 @@ export function useFocusLeaveListener(el: MaybeRefOrGetter<Element | undefined>,
       handler();
     }
   });
+}
+
+export function useElementHover(el: MaybeRefOrGetter<Element | undefined>) {
+  const isHovered = ref(false);
+
+  // initial hover state
+  watch(toRef(el), (newValue) => {
+    isHovered.value = isDefined(newValue) && newValue.matches(':hover');
+  });
+
+  // update hover state
+  useEventListener(el, ['mouseenter', 'mouseleave'], (event) => {
+    isHovered.value = event.type === 'mouseenter';
+  });
+
+  return isHovered;
 }

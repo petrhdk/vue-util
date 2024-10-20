@@ -10,8 +10,9 @@ import {
   useFloating,
 } from '@floating-ui/vue';
 import { isDefined, isNotDefined } from '@petrhdk/util';
-import { useEventListener, useMutationObserver } from '@vueuse/core';
+import { useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref, watchEffect } from 'vue';
+import { useElementHover } from './index.ts';
 
 /* props */
 const props = withDefaults(defineProps<{
@@ -108,19 +109,7 @@ const referenceEl = computed<Element | undefined>(() => {
 
   return undefined;
 });
-
-/* reference element hover state */
-const referenceElementIsHovered = ref(false);
-// initial hover state
-watchEffect(() => {
-  if (isDefined(referenceEl.value)) {
-    referenceElementIsHovered.value = referenceEl.value.matches(':hover');
-  }
-});
-// update hover state
-useEventListener(referenceEl, ['mouseenter', 'mouseleave'], (event) => {
-  referenceElementIsHovered.value = event.type === 'mouseenter';
-});
+const referenceElementIsHovered = useElementHover(referenceEl);
 
 /* collect slot content */
 const slotElement = ref<HTMLElement>();
