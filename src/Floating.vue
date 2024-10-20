@@ -16,8 +16,8 @@ import { useElementHover } from './index.ts';
 
 /* props */
 const props = withDefaults(defineProps<{
-  relativeTo: 'parentElement' | 'previousElementSibling',
-  placement: Placement,
+  relativeTo?: 'parentElement' | 'previousElementSibling',
+  placement?: Placement,
   fallbackPlacements?: Placement[],
   offset?: OffsetOptions,
   baseWidth?: number,
@@ -26,6 +26,8 @@ const props = withDefaults(defineProps<{
   zIndex?: string,
   toggleOnHover?: boolean,
 }>(), {
+  relativeTo: 'parentElement',
+  placement: 'bottom',
   fallbackPlacements: ({ placement }) => {
     if (placement === 'top') {
       return ['bottom', 'right', 'left'];
