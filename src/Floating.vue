@@ -18,7 +18,6 @@ import { useElementHover } from './index.ts';
 const props = withDefaults(defineProps<{
   relativeTo?: 'parentElement' | 'previousElementSibling',
   placement?: Placement,
-  fallbackPlacements?: Placement[],
   offset?: OffsetOptions,
   baseWidth?: number,
   viewportPadding?: number,
@@ -28,61 +27,63 @@ const props = withDefaults(defineProps<{
 }>(), {
   relativeTo: 'parentElement',
   placement: 'bottom',
-  fallbackPlacements: ({ placement }) => {
-    if (placement === 'top') {
-      return ['bottom', 'right', 'left'];
-    }
-    if (placement === 'bottom') {
-      return ['top', 'right', 'left'];
-    }
-    if (placement === 'left') {
-      return ['right', 'bottom', 'top'];
-    }
-    if (placement === 'right') {
-      return ['left', 'bottom', 'top'];
-    }
-
-    const [side, alignment] = placement.split('-') as ['top' | 'bottom' | 'left' | 'right', 'start' | 'end'];
-
-    function opposite(sideOrAlignment: 'top' | 'bottom' | 'left' | 'right' | 'start' | 'end') {
-      switch (sideOrAlignment) {
-        case 'top': return 'bottom';
-        case 'bottom': return 'top';
-        case 'left': return 'right';
-        case 'right': return 'left';
-        case 'start': return 'end';
-        case 'end': return 'start';
-      }
-    }
-
-    function diagonal(side: 'top' | 'bottom' | 'left' | 'right') {
-      switch (side) {
-        case 'right': return 'bottom';
-        case 'bottom': return 'right';
-        case 'left': return 'top';
-        case 'top': return 'left';
-      }
-    }
-
-    return [
-    // `${side}-${alignment}`,
-      `${side}-${opposite(alignment)}`,
-      `${opposite(side)}-${alignment}`,
-      `${opposite(side)}-${opposite(alignment)}`,
-      `${diagonal(side)}-${alignment}`,
-      `${diagonal(side)}-${opposite(alignment)}`,
-      `${opposite(diagonal(side))}-${alignment}`,
-      `${opposite(diagonal(side))}-${opposite(alignment)}`,
-      side,
-      opposite(side),
-      diagonal(side),
-      opposite(diagonal(side)),
-    ] as Placement[];
-  },
   offset: 8,
   viewportPadding: 8,
   teleportTo: () => document.body,
   zIndex: '100',
+});
+
+/* construct fallback placements */
+const fallbackPlacements = computed<Placement[]>(() => {
+  if (props.placement === 'top') {
+    return ['bottom', 'right', 'left'];
+  }
+  if (props.placement === 'bottom') {
+    return ['top', 'right', 'left'];
+  }
+  if (props.placement === 'left') {
+    return ['right', 'bottom', 'top'];
+  }
+  if (props.placement === 'right') {
+    return ['left', 'bottom', 'top'];
+  }
+
+  const [side, alignment] = props.placement.split('-') as ['top' | 'bottom' | 'left' | 'right', 'start' | 'end'];
+
+  function opposite(sideOrAlignment: 'top' | 'bottom' | 'left' | 'right' | 'start' | 'end') {
+    switch (sideOrAlignment) {
+      case 'top': return 'bottom';
+      case 'bottom': return 'top';
+      case 'left': return 'right';
+      case 'right': return 'left';
+      case 'start': return 'end';
+      case 'end': return 'start';
+    }
+  }
+
+  function diagonal(side: 'top' | 'bottom' | 'left' | 'right') {
+    switch (side) {
+      case 'right': return 'bottom';
+      case 'bottom': return 'right';
+      case 'left': return 'top';
+      case 'top': return 'left';
+    }
+  }
+
+  return [
+    // `${side}-${alignment}`,
+    `${side}-${opposite(alignment)}`,
+    `${opposite(side)}-${alignment}`,
+    `${opposite(side)}-${opposite(alignment)}`,
+    `${diagonal(side)}-${alignment}`,
+    `${diagonal(side)}-${opposite(alignment)}`,
+    `${opposite(diagonal(side))}-${alignment}`,
+    `${opposite(diagonal(side))}-${opposite(alignment)}`,
+    side,
+    opposite(side),
+    diagonal(side),
+    opposite(diagonal(side)),
+  ] as Placement[];
 });
 
 /* template refs */
@@ -140,7 +141,7 @@ const { floatingStyles } = useFloating(referenceEl, floatingEl, {
   middleware: [
     offset(props.offset),
     flip({
-      fallbackPlacements: props.fallbackPlacements,
+      fallbackPlacements: fallbackPlacements.value,
       padding: props.viewportPadding,
     }),
     shift({
