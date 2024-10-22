@@ -139,7 +139,7 @@ const floatingEl = computed(() => {
 const maxWidth = ref<string>();
 const maxHeight = ref<string>();
 const minWidth = ref<string>();
-const { floatingStyles } = useFloating(referenceEl, floatingEl, {
+const { floatingStyles, isPositioned } = useFloating(referenceEl, floatingEl, {
   placement: props.placement,
   middleware: [
     offset(props.offset),
@@ -179,6 +179,7 @@ watchEffect(() => {
     });
   }
 });
+defineExpose({ isPositioned });
 </script>
 
 <template>
