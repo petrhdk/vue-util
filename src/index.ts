@@ -34,3 +34,35 @@ export function useElementHover(el: MaybeRefOrGetter<Element | undefined>) {
 
   return isHovered;
 }
+
+export function useDelayedElementHover(
+  el: MaybeRefOrGetter<Element | undefined>,
+  delay: MaybeRefOrGetter<number>,
+) {
+  // raw hover state
+  const isHovered = useElementHover(el);
+
+  // hover state that only activates after `delay` milliseconds
+  const hoverActive = ref<boolean>(false);
+  let timeoutId: number | undefined;
+  watch(isHovered, () => {
+    if (isHovered.value) {
+      // activate hover
+      if (toValue(delay) === 0) {
+        hoverActive.value = true;
+      }
+      else {
+        timeoutId = setTimeout(() => {
+          hoverActive.value = true;
+        }, toValue(delay));
+      }
+    }
+    else {
+      // deactivate hover (immediately), and cancel any timeout
+      hoverActive.value = false;
+      clearTimeout(timeoutId);
+    }
+  });
+
+  return hoverActive;
+}

@@ -12,7 +12,7 @@ import {
 import { isDefined, isNotDefined } from '@petrhdk/util';
 import { useMutationObserver } from '@vueuse/core';
 import { computed, onMounted, ref, watchEffect } from 'vue';
-import { useElementHover } from './index.ts';
+import { useDelayedElementHover } from './index.ts';
 
 /* props */
 const props = withDefaults(defineProps<{
@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<{
   teleportTo?: Node,
   zIndex?: string,
   toggleOnHover?: boolean,
+  toggleOnHoverDelay?: number,
 }>(), {
   relativeTo: 'parentElement',
   placement: 'bottom',
@@ -31,6 +32,7 @@ const props = withDefaults(defineProps<{
   viewportPadding: 8,
   teleportTo: () => document.body,
   zIndex: '100',
+  toggleOnHoverDelay: 0,
 });
 
 /* construct fallback placements */
@@ -112,7 +114,12 @@ const referenceEl = computed<Element | undefined>(() => {
 
   return undefined;
 });
-const referenceElementIsHovered = useElementHover(referenceEl);
+
+/* reference element hover, only activating after delay */
+const referenceElementIsHovered = useDelayedElementHover(
+  referenceEl,
+  () => props.toggleOnHoverDelay,
+);
 
 /* collect slot content */
 const slotElement = ref<HTMLElement>();
@@ -128,7 +135,7 @@ function updateSlotElement() {
 onMounted(updateSlotElement);
 useMutationObserver(slotContainer, updateSlotElement, { childList: true });
 
-/* floating element */
+/* floating element, with filter for hover state */
 const floatingEl = computed(() => {
   if (props.toggleOnHover && !referenceElementIsHovered.value)
     return undefined;
