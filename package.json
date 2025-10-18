@@ -1,7 +1,7 @@
 {
   "name": "@petrhdk/vue-util",
   "type": "module",
-  "version": "9.2.0",
+  "version": "9.3.0",
   "license": "MIT",
   "repository": "github:petrhdk/vue-util",
   "exports": {
@@ -23,7 +23,7 @@
   "dependencies": {
     "@floating-ui/vue": "^1.1.5",
     "@petrhdk/util": "^3.1.0",
-    "@vueuse/core": "^11.1.0"
+    "@vueuse/core": "^13.9.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",

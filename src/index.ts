@@ -1,6 +1,6 @@
 import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
 import { useEventListener } from '@vueuse/core';
-import { type MaybeRefOrGetter, ref, toRef, toValue, watch } from 'vue';
+import { type MaybeRefOrGetter, reactive, ref, toRef, toValue, watch, watchEffect } from 'vue';
 
 export { default as DivButton } from './DivButton.vue';
 export { default as Floating } from './Floating.vue';
@@ -30,6 +30,26 @@ export function useElementHover(el: MaybeRefOrGetter<Element | null | undefined>
   // update hover state
   useEventListener(el, ['mouseenter', 'mouseleave'], (event) => {
     isHovered.value = event.type === 'mouseenter';
+  });
+
+  return isHovered;
+}
+
+export function useElementsHover(elements: MaybeRefOrGetter<Element[] | null>) {
+  const isHovered = reactive<boolean[]>([]);
+
+  // initial hover state / whenever elements change
+  watchEffect(() => {
+    isHovered.splice(0, isHovered.length);
+    for (const el of toValue(elements) ?? []) {
+      isHovered.push(el.matches(':hover'));
+    }
+  });
+
+  // update hover state
+  useEventListener(elements, ['mouseenter', 'mouseleave'], (event) => {
+    const i = toValue(elements)!.indexOf(event.currentTarget as Element);
+    isHovered[i] = event.type === 'mouseenter';
   });
 
   return isHovered;
