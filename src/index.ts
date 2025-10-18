@@ -19,7 +19,7 @@ export function useFocusLeaveListener(el: MaybeRefOrGetter<Element | undefined>,
   });
 }
 
-export function useElementHover(el: MaybeRefOrGetter<Element | undefined>) {
+export function useElementHover(el: MaybeRefOrGetter<Element | null | undefined>) {
   const isHovered = ref(false);
 
   // initial hover state
