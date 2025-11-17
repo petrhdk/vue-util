@@ -8,7 +8,7 @@ export { default as Floating } from './Floating.vue';
 /**
  * listen to when focus moves to somewhere outside the given element
  */
-export function useFocusLeaveListener(el: MaybeRefOrGetter<Element | undefined>, handler: () => void) {
+export function useFocusLeaveListener(el: MaybeRefOrGetter<Element | null | undefined>, handler: () => void) {
   useEventListener(el, 'focusout', (event: FocusEvent) => {
     if (
       isNotDefined(event.relatedTarget) ||
