@@ -86,3 +86,26 @@ export function useDelayedElementHover(
 
   return hoverActive;
 }
+
+export function useElementsFocus(elements: MaybeRefOrGetter<Element[] | null>) {
+  const isFocused = reactive<boolean[]>([]);
+
+  // initial hover state / whenever elements change
+  watchEffect(() => {
+    // clear the old array values
+    isFocused.splice(0, isFocused.length);
+
+    // push new values
+    for (const el of toValue(elements) ?? []) {
+      isFocused.push(el.matches(':focus'));
+    }
+  });
+
+  // update hover state
+  useEventListener(elements, ['focus', 'blur'], (event) => {
+    const elementIndex = toValue(elements)!.indexOf(event.currentTarget as Element);
+    isFocused[elementIndex] = event.type === 'focus';
+  });
+
+  return isFocused;
+}
