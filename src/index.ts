@@ -1,4 +1,4 @@
-import { assertInstanceof, isDefined, isNotDefined } from '@petrhdk/util';
+import { assertInstanceof, focusedElement, isDefined, isNotDefined } from '@petrhdk/util';
 import { useEventListener } from '@vueuse/core';
 import { type MaybeRefOrGetter, reactive, ref, toRef, toValue, watch, watchEffect } from 'vue';
 
@@ -85,6 +85,16 @@ export function useDelayedElementHover(
   });
 
   return hoverActive;
+}
+
+export function useElementFocus(element: MaybeRefOrGetter<Element | undefined>) {
+  const isFocused = ref<boolean>(
+    isDefined(toValue(element)) && toValue(element) === focusedElement(),
+  );
+  useEventListener(element, ['focus', 'blur'], (event) => {
+    isFocused.value = event.type === 'focus';
+  });
+  return isFocused;
 }
 
 export function useElementsFocus(elements: MaybeRefOrGetter<Element[] | null>) {
