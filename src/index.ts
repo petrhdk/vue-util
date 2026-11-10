@@ -4,6 +4,7 @@ import { type MaybeRefOrGetter, reactive, ref, toRef, toValue, watch, watchEffec
 
 export { default as DivButton } from './DivButton.vue';
 export { default as Floating } from './Floating.vue';
+export { useElementFocusVisible } from './useElementFocusVisible.ts';
 
 /**
  * listen to when focus moves to somewhere outside the given element
